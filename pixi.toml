@@ -11,22 +11,13 @@ version = "0.1.0"
 [activation.env]
 ROS_DOMAIN_ID = "13"
 
-# This will automatically activate the ROS workspace on activation
-[target.win.activation]
-scripts = ["install/setup.bat"]
-
 [target.unix.activation]
 # For activation scripts, we use bash for Unix-like systems
-scripts = ["install/setup.bash"]
+scripts = ["install/setup.bash", "scripts/set_env_vars.sh"]
 
-
-[feature.build.target.win-64.tasks]
-build = "colcon build --merge-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPython_FIND_VIRTUALENV=ONLY -DPython3_FIND_VIRTUALENV=ONLY --base-paths src/local"
 
 [feature.build.target.unix.tasks]
-build = "colcon build --symlink-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPython_FIND_VIRTUALENV=ONLY -DPython3_FIND_VIRTUALENV=ONLY --base-paths src/local"
-
-[feature.build.tasks]
+build = "colcon build --symlink-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPython_FIND_VIRTUALENV=ONLY -DPython3_FIND_VIRTUALENV=ONLY --base-paths src/"
 deploy = { depends-on = ["build"], cmd = [
     # todo: replace with launch file
     "ros2",
@@ -39,10 +30,6 @@ deploy = { depends-on = ["build"], cmd = [
 [target.unix.tasks]
 # opens the rerun viewer based on your calculated port
 rerun = { cmd = ["rerun", "--port", "$(sh scripts/calculate_rerun_port.sh)"] }
-
-[target.win-64.tasks]
-# untested
-rerun = { cmd = ["rerun", "--port", "$(scripts\\calculate_rerun_port.bat)"] }
 
 # Dependencies used by all environments
 [dependencies]

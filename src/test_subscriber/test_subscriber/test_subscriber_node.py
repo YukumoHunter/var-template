@@ -6,14 +6,15 @@ from sensor_msgs.msg import CameraInfo, CompressedImage
 
 import rerun as rr
 from cv_bridge import CvBridge
-# import cv2
+
+import os
 
 
 class ImageLogger(Node):
     def __init__(self):
         super().__init__("image_logger")
         self.cv_bridge = CvBridge()
-        self._spawn_rerun()
+        self._init_rerun()
 
         image_sub = message_filters.Subscriber(
             self, CompressedImage, "/image_rect/compressed"
@@ -27,8 +28,9 @@ class ImageLogger(Node):
         )
         synchronized.registerCallback(self.image_callback)
 
-    def _spawn_rerun(self):
-        rr.init("test_subscriber", spawn=True)
+    def _init_rerun(self):
+        rr.init("test_subscriber")
+        rr.connect_grpc(f"rerun+http://127.0.0.1:{os.environ['RERUN_PORT']}/proxy")
 
     def image_callback(self, image: CompressedImage, info: CameraInfo):
         cv_image = self.cv_bridge.compressed_imgmsg_to_cv2(

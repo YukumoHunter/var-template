@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ROS_DOMAIN_ID=$(( ${ROS_DOMAIN_ID} ))
 if [ $ROS_DOMAIN_ID -lt 10 ]; then
