@@ -1,0 +1,15 @@
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+# ros2 shit
+build/
+install/
+log/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/

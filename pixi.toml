@@ -1,0 +1,83 @@
+[workspace]
+name = "var-template"
+authors = ["Harold Ruiter <harold@soaratorium.com>"]
+description = "Development environment for RoboStack ROS packages"
+channels = ["conda-forge"]
+platforms = ["linux-64", "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
+version = "0.1.0"
+
+
+# Set environment variables for your ROS workspace
+[activation.env]
+ROS_DOMAIN_ID = "13"
+
+# This will automatically activate the ROS workspace on activation
+[target.win.activation]
+scripts = ["install/setup.bat"]
+
+[target.unix.activation]
+# For activation scripts, we use bash for Unix-like systems
+scripts = ["install/setup.bash"]
+
+
+[feature.build.target.win-64.tasks]
+build = "colcon build --merge-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPython_FIND_VIRTUALENV=ONLY -DPython3_FIND_VIRTUALENV=ONLY --base-paths src/local"
+
+[feature.build.target.unix.tasks]
+build = "colcon build --symlink-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPython_FIND_VIRTUALENV=ONLY -DPython3_FIND_VIRTUALENV=ONLY --base-paths src/local"
+
+[feature.build.tasks]
+deploy = { depends-on = ["build"], cmd = [
+    # todo: replace with launch file
+    "ros2",
+    "run",
+    "test_subscriber",
+    "test_subscriber_node",
+
+] }
+
+[target.unix.tasks]
+# opens the rerun viewer based on your calculated port
+rerun = { cmd = ["rerun", "--port", "$(sh scripts/calculate_rerun_port.sh)"] }
+
+[target.win-64.tasks]
+# untested
+rerun = { cmd = ["rerun", "--port", "$(scripts\\calculate_rerun_port.bat)"] }
+
+# Dependencies used by all environments
+[dependencies]
+python = "*"
+
+# Build tools
+compilers = "*"
+cmake = "*"
+pkg-config = "*"
+make = "*"
+ninja = "*"
+
+# ROS specific tools
+rosdep = "*"
+colcon-common-extensions = ">=0.3.0,<0.4"
+rerun-sdk = ">=0.23.4,<0.27"
+
+[pypi-dependencies]
+ty = ">=0.0.1a25, <0.0.1a26"
+ruff = ">=0.14.2, <0.15"
+
+[target.linux.dependencies]
+libgl-devel = "*"
+
+
+# Define all the different ROS environments
+# Each environment corresponds to a different ROS distribution
+# and can be activated using the `pixi run/shell -e <environment>` command.
+[environments]
+humble = { features = ["humble", "build"] }
+
+
+# ROS Humble
+[feature.humble]
+channels = ["https://prefix.dev/robostack-humble"]
+
+[feature.humble.dependencies]
+ros-humble-desktop = "*"
