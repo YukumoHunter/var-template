@@ -3,20 +3,16 @@ name = "var-template"
 authors = ["Harold Ruiter <harold@soaratorium.com>"]
 description = "Development environment for RoboStack ROS packages"
 channels = ["conda-forge"]
-platforms = ["linux-64", "win-64", "osx-64", "osx-arm64", "linux-aarch64"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "linux-aarch64"]
 version = "0.1.0"
 
 
-# Set environment variables for your ROS workspace
-[activation.env]
-ROS_DOMAIN_ID = "13"
-
-[target.unix.activation]
-# For activation scripts, we use bash for Unix-like systems
+[activation]
+env = { "ROS_DOMAIN_ID" = "13" }
 scripts = ["install/setup.bash", "scripts/set_env_vars.sh"]
 
 
-[feature.build.target.unix.tasks]
+[feature.build.tasks]
 build = "colcon build --symlink-install --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DPython_FIND_VIRTUALENV=ONLY -DPython3_FIND_VIRTUALENV=ONLY --base-paths src/"
 deploy = { depends-on = ["build"], cmd = [
     # todo: replace with launch file
@@ -27,9 +23,9 @@ deploy = { depends-on = ["build"], cmd = [
 
 ] }
 
-[target.unix.tasks]
+[tasks]
 # opens the rerun viewer based on your calculated port
-rerun = { cmd = ["rerun", "--port", "$(sh scripts/calculate_rerun_port.sh)"] }
+rerun = { cmd = ["rerun", "--port", "$RERUN_PORT"] }
 
 # Dependencies used by all environments
 [dependencies]
